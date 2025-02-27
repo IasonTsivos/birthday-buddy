@@ -19,109 +19,8 @@ const calculateAge = (birthYear: number): number => {
   return currentYear - birthYear;
 };
 
-// Sample birthdays data
-export const sampleBirthdays: Birthday[] = [
-  {
-    id: "1",
-    name: "John Smith",
-    date: getBirthdayDateThisYear(3, 15),
-    icon: {
-      emoji: "👨",
-      color: "bg-birthday-blue"
-    },
-    age: calculateAge(1985),
-    wishes: "Happy birthday! May your day be filled with joy and laughter!",
-    notes: ["Loves chocolate cake", "Prefer surprise parties", "Allergic to nuts"],
-    giftIdeas: [
-      {
-        id: "g1",
-        title: "Wireless Headphones",
-        description: "Sony WH-1000XM4",
-        price: "$299",
-        link: "https://example.com/headphones",
-        purchased: false
-      },
-      {
-        id: "g2",
-        title: "Fitness Watch",
-        description: "Tracks steps, heart rate, and sleep",
-        price: "$149",
-        purchased: true
-      }
-    ]
-  },
-  {
-    id: "2",
-    name: "Emma Johnson",
-    date: getBirthdayDateThisYear(5, 22),
-    icon: {
-      emoji: "👩",
-      color: "bg-birthday-pink"
-    },
-    age: calculateAge(1990),
-    wishes: "Wishing you an amazing birthday filled with wonderful surprises!",
-    notes: ["Loves painting", "Favorite color is blue"],
-    giftIdeas: [
-      {
-        id: "g3",
-        title: "Painting Set",
-        description: "Professional acrylic paints with canvas",
-        price: "$79",
-        purchased: false
-      }
-    ]
-  },
-  {
-    id: "3",
-    name: "Michael Davis",
-    date: getBirthdayDateThisYear(7, 10),
-    icon: {
-      emoji: "🎮",
-      color: "bg-birthday-green"
-    },
-    age: calculateAge(1988),
-    giftIdeas: [
-      {
-        id: "g4",
-        title: "Gaming Controller",
-        description: "Xbox Elite Controller",
-        price: "$159",
-        purchased: false
-      }
-    ]
-  },
-  {
-    id: "4",
-    name: "Sophia Chen",
-    date: getBirthdayDateThisYear(2, 5),
-    icon: {
-      emoji: "📚",
-      color: "bg-birthday-yellow"
-    },
-    age: calculateAge(1992),
-    wishes: "Happy birthday to my favorite bookworm! Hope your day is as wonderful as you are!",
-    notes: ["Loves mystery novels", "Coffee enthusiast"],
-    giftIdeas: [
-      {
-        id: "g5",
-        title: "Book Subscription",
-        description: "3-month mystery book subscription",
-        price: "$65",
-        purchased: false
-      }
-    ]
-  },
-  {
-    id: "5",
-    name: "David Wilson",
-    date: getBirthdayDateThisYear(10, 18),
-    icon: {
-      emoji: "🎸",
-      color: "bg-birthday-orange"
-    },
-    age: calculateAge(1983),
-  }
-];
+// Empty birthdays array (no sample data)
+export const sampleBirthdays: Birthday[] = [];
 
 // Helper to sort birthdays by upcoming date
 export const sortBirthdaysByUpcoming = (birthdays: Birthday[]): Birthday[] => {
@@ -193,8 +92,8 @@ export const saveBirthdays = (birthdays: Birthday[]): void => {
 export const loadBirthdays = (): Birthday[] => {
   const storedBirthdays = localStorage.getItem("birthdays");
   if (!storedBirthdays) {
-    console.log("No stored birthdays found, using sample data");
-    return sampleBirthdays;
+    console.log("No stored birthdays found, using empty array");
+    return [];
   }
   
   try {
@@ -208,6 +107,6 @@ export const loadBirthdays = (): Birthday[] => {
     }));
   } catch (error) {
     console.error("Error loading birthdays from localStorage:", error);
-    return sampleBirthdays;
+    return [];
   }
 };
