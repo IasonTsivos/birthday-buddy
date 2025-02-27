@@ -126,7 +126,11 @@ export const sampleBirthdays: Birthday[] = [
 
 // Helper to sort birthdays by upcoming date
 export const sortBirthdaysByUpcoming = (birthdays: Birthday[]): Birthday[] => {
-  return [...birthdays].sort((a, b) => a.date.getTime() - b.date.getTime());
+  return [...birthdays].sort((a, b) => {
+    const dateA = new Date(a.date);
+    const dateB = new Date(b.date);
+    return dateA.getTime() - dateB.getTime();
+  });
 };
 
 // Helper to get days until birthday
