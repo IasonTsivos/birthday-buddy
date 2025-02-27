@@ -1,7 +1,8 @@
 
 import React from "react";
 import { Link } from "react-router-dom";
-import { Birthday, getDaysUntil, getMonthDate } from "@/types";
+import { Birthday } from "@/types";
+import { getDaysUntil, getMonthDate } from "@/lib/data";
 import { ChevronRight } from "lucide-react";
 
 interface BirthdayCardProps {
