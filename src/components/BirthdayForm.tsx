@@ -1,10 +1,10 @@
 
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Birthday, IconOption } from "@/types";
+import { Birthday, IconOption, GiftIdea } from "@/types";
 import { useToast } from "@/hooks/use-toast";
 import IconSelector from "./IconSelector";
-import { Calendar, ChevronLeft, Save } from "lucide-react";
+import { Calendar, ChevronLeft, Gift, Plus, Save, Trash } from "lucide-react";
 
 interface BirthdayFormProps {
   initialBirthday?: Partial<Birthday>;
@@ -37,6 +37,13 @@ const BirthdayForm: React.FC<BirthdayFormProps> = ({
   );
   const [wishes, setWishes] = useState(initialBirthday?.wishes || "");
   const [notes, setNotes] = useState(initialBirthday?.notes?.join("\n") || "");
+  const [giftIdeas, setGiftIdeas] = useState<GiftIdea[]>(initialBirthday?.giftIdeas || []);
+  const [newGift, setNewGift] = useState({
+    title: "",
+    description: "",
+    price: "",
+  });
+  const [isAddingGift, setIsAddingGift] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -64,10 +71,46 @@ const BirthdayForm: React.FC<BirthdayFormProps> = ({
       age,
       wishes: wishes.trim() || undefined,
       notes: notes.trim() ? notes.split("\n").filter(note => note.trim()) : undefined,
-      giftIdeas: initialBirthday?.giftIdeas || [],
+      giftIdeas,
     };
     
     onSubmit(birthdayData);
+  };
+
+  const addGiftIdea = () => {
+    if (!newGift.title.trim()) {
+      toast({
+        title: "Error",
+        description: "Gift title is required",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const newGiftIdea: GiftIdea = {
+      id: Date.now().toString(),
+      title: newGift.title.trim(),
+      description: newGift.description.trim() || undefined,
+      price: newGift.price.trim() || undefined,
+      purchased: false,
+    };
+
+    setGiftIdeas([...giftIdeas, newGiftIdea]);
+    setNewGift({
+      title: "",
+      description: "",
+      price: "",
+    });
+    setIsAddingGift(false);
+
+    toast({
+      title: "Gift idea added",
+      description: "Added to your gift ideas list",
+    });
+  };
+
+  const removeGiftIdea = (giftId: string) => {
+    setGiftIdeas(giftIdeas.filter(gift => gift.id !== giftId));
   };
 
   return (
@@ -176,6 +219,106 @@ const BirthdayForm: React.FC<BirthdayFormProps> = ({
           placeholder="Add notes about your friend (one per line)"
         />
         <p className="text-xs text-gray-500 mt-1">Write each note on a new line</p>
+      </div>
+      
+      {/* Gift Ideas Section */}
+      <div className="mb-6">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center">
+            <Gift className="h-5 w-5 text-purple mr-2" />
+            <h3 className="font-medium">Gift Ideas</h3>
+            <span className="ml-2 bg-gray-100 text-gray-600 text-xs px-2 py-0.5 rounded-full">
+              {giftIdeas.length}
+            </span>
+          </div>
+          <button 
+            type="button"
+            onClick={() => setIsAddingGift(!isAddingGift)} 
+            className="text-sm text-purple flex items-center"
+          >
+            <Plus className="h-4 w-4 mr-1" />
+            Add Idea
+          </button>
+        </div>
+        
+        {giftIdeas.length > 0 ? (
+          <div className="space-y-3 mb-4">
+            {giftIdeas.map((gift) => (
+              <div key={gift.id} className="p-3 rounded-xl bg-white border border-gray-100 flex items-start">
+                <div className="flex-1">
+                  <div className="flex justify-between">
+                    <h4 className="font-medium">{gift.title}</h4>
+                    {gift.price && <span className="text-sm text-purple-dark">{gift.price}</span>}
+                  </div>
+                  {gift.description && <p className="text-sm mt-1 text-gray-600">{gift.description}</p>}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => removeGiftIdea(gift.id)}
+                  className="ml-2 p-1 text-gray-400 hover:text-red-500 rounded"
+                >
+                  <Trash className="h-4 w-4" />
+                </button>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-6 mb-4 text-gray-500 bg-gray-50 rounded-xl">
+            <Gift className="h-10 w-10 mx-auto mb-2 text-gray-300" />
+            <p>No gift ideas yet</p>
+          </div>
+        )}
+        
+        {isAddingGift && (
+          <div className="p-4 border border-gray-200 rounded-xl animate-fade-in">
+            <h4 className="font-medium mb-3">Add New Gift Idea</h4>
+            <div className="space-y-3">
+              <div>
+                <input
+                  type="text"
+                  placeholder="Gift title *"
+                  className="input-field"
+                  value={newGift.title}
+                  onChange={(e) => setNewGift({ ...newGift, title: e.target.value })}
+                />
+              </div>
+              <div>
+                <input
+                  type="text"
+                  placeholder="Description (optional)"
+                  className="input-field"
+                  value={newGift.description}
+                  onChange={(e) => setNewGift({ ...newGift, description: e.target.value })}
+                />
+              </div>
+              <div>
+                <input
+                  type="text"
+                  placeholder="Price (optional)"
+                  className="input-field"
+                  value={newGift.price}
+                  onChange={(e) => setNewGift({ ...newGift, price: e.target.value })}
+                />
+              </div>
+              <div className="flex space-x-2 justify-end">
+                <button
+                  type="button"
+                  className="px-3 py-2 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors"
+                  onClick={() => setIsAddingGift(false)}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  className="px-3 py-2 rounded-lg bg-purple text-white hover:bg-purple-dark transition-colors"
+                  onClick={addGiftIdea}
+                >
+                  Add Gift
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
       
       <div className="flex justify-end">

@@ -11,8 +11,9 @@ const Index: React.FC = () => {
   const [birthdays, setBirthdays] = useState<Birthday[]>([]);
   const [loading, setLoading] = useState(true);
   
+  // This will force reloading data when we navigate back to this page
   useEffect(() => {
-    const loadData = async () => {
+    const loadData = () => {
       try {
         const birthdaysData = loadBirthdays();
         setBirthdays(sortBirthdaysByUpcoming(birthdaysData));
@@ -24,6 +25,13 @@ const Index: React.FC = () => {
     };
     
     loadData();
+    
+    // Add event listener for focus to refresh data when coming back to tab
+    window.addEventListener('focus', loadData);
+    
+    return () => {
+      window.removeEventListener('focus', loadData);
+    };
   }, []);
   
   if (loading) {
@@ -91,8 +99,13 @@ const Index: React.FC = () => {
         
         {upcomingBirthdays.length > 0 ? (
           <div>
-            {upcomingBirthdays.map(birthday => (
-              <BirthdayCard key={birthday.id} birthday={birthday} />
+            {upcomingBirthdays.map((birthday, index) => (
+              <div key={birthday.id} className={index === 0 ? "mb-5 transform scale-[1.02]" : ""}>
+                <BirthdayCard 
+                  birthday={birthday} 
+                  isFeatured={index === 0}
+                />
+              </div>
             ))}
           </div>
         ) : (
