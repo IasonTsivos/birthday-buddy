@@ -1,4 +1,3 @@
-
 import { Birthday, GiftIdea } from "@/types";
 
 // Current date for calculations
@@ -6,7 +5,7 @@ const currentDate = new Date();
 const currentYear = currentDate.getFullYear();
 
 // Helper to generate future birthday date
-const getBirthdayDateThisYear = (month: number, day: number): Date => {
+export const getBirthdayDateThisYear = (month: number, day: number): Date => {
   const date = new Date(currentYear, month - 1, day);
   // If birthday has passed this year, set to next year
   if (date < currentDate) {
@@ -180,16 +179,28 @@ export const getMonthDate = (date: Date): string => {
 
 // Save birthdays to localStorage
 export const saveBirthdays = (birthdays: Birthday[]): void => {
-  localStorage.setItem("birthdays", JSON.stringify(birthdays));
+  const birthdaysToSave = birthdays.map(birthday => ({
+    ...birthday,
+    // Keep the date as a string for storage
+    date: birthday.date instanceof Date ? birthday.date.toISOString() : birthday.date
+  }));
+  
+  localStorage.setItem("birthdays", JSON.stringify(birthdaysToSave));
+  console.log("Saved birthdays to localStorage:", birthdaysToSave.length);
 };
 
 // Load birthdays from localStorage
 export const loadBirthdays = (): Birthday[] => {
   const storedBirthdays = localStorage.getItem("birthdays");
-  if (!storedBirthdays) return sampleBirthdays;
+  if (!storedBirthdays) {
+    console.log("No stored birthdays found, using sample data");
+    return sampleBirthdays;
+  }
   
   try {
     const parsedBirthdays = JSON.parse(storedBirthdays);
+    console.log("Loaded birthdays from localStorage:", parsedBirthdays.length);
+    
     // Convert string dates back to Date objects
     return parsedBirthdays.map((birthday: any) => ({
       ...birthday,

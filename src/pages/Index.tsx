@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Birthday } from "@/types";
 import { loadBirthdays, sortBirthdaysByUpcoming, formatDateWithDay } from "@/lib/data";
 import BirthdayCard from "@/components/BirthdayCard";
@@ -10,29 +10,26 @@ import { Bell, Search } from "lucide-react";
 const Index: React.FC = () => {
   const [birthdays, setBirthdays] = useState<Birthday[]>([]);
   const [loading, setLoading] = useState(true);
+  const location = useLocation();
   
-  // This will force reloading data when we navigate back to this page
+  // Load data whenever component mounts or location changes (like after navigation)
   useEffect(() => {
-    const loadData = () => {
-      try {
-        const birthdaysData = loadBirthdays();
-        setBirthdays(sortBirthdaysByUpcoming(birthdaysData));
-      } catch (error) {
-        console.error("Error loading birthdays:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    
     loadData();
-    
-    // Add event listener for focus to refresh data when coming back to tab
-    window.addEventListener('focus', loadData);
-    
-    return () => {
-      window.removeEventListener('focus', loadData);
-    };
-  }, []);
+  }, [location.pathname]); // This will trigger when navigation occurs
+  
+  // Function to load birthdays data
+  const loadData = () => {
+    try {
+      setLoading(true);
+      const birthdaysData = loadBirthdays();
+      console.log("Loaded birthdays:", birthdaysData.length);
+      setBirthdays(sortBirthdaysByUpcoming(birthdaysData));
+    } catch (error) {
+      console.error("Error loading birthdays:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
   
   if (loading) {
     return (
@@ -70,7 +67,10 @@ const Index: React.FC = () => {
           <h1 className="text-2xl font-bold">{formatDateWithDay(new Date())}</h1>
         </div>
         <div className="flex space-x-2">
-          <button className="p-2 rounded-full bg-gray-100 text-gray-600">
+          <button 
+            className="p-2 rounded-full bg-gray-100 text-gray-600"
+            onClick={loadData} // Add refresh button functionality
+          >
             <Search className="h-5 w-5" />
           </button>
           <button className="p-2 rounded-full bg-gray-100 text-gray-600">

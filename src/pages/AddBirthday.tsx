@@ -2,7 +2,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Birthday } from "@/types";
-import { loadBirthdays, saveBirthdays } from "@/lib/data";
+import { loadBirthdays, saveBirthdays, getBirthdayDateThisYear } from "@/lib/data";
 import BirthdayForm from "@/components/BirthdayForm";
 import TabBar from "@/components/TabBar";
 import { useToast } from "@/hooks/use-toast";
@@ -16,11 +16,17 @@ const AddBirthday: React.FC = () => {
       // Load existing birthdays
       const existingBirthdays = loadBirthdays();
       
+      // Ensure we have a proper date object for the new birthday
+      const birthdayDate = new Date(birthdayData.date);
+      
       // Create new birthday with ID
       const newBirthday: Birthday = {
         ...birthdayData,
         id: Date.now().toString(),
+        date: birthdayDate, // Ensure we're using a Date object
       };
+      
+      console.log("Adding new birthday:", newBirthday);
       
       // Add new birthday to list
       const updatedBirthdays = [...existingBirthdays, newBirthday];
@@ -34,8 +40,8 @@ const AddBirthday: React.FC = () => {
         description: `${newBirthday.name}'s birthday has been added.`,
       });
       
-      // Navigate back to home
-      navigate("/");
+      // Navigate back to home with a state parameter to force refresh
+      navigate("/", { state: { refresh: true } });
     } catch (error) {
       console.error("Error adding birthday:", error);
       toast({
